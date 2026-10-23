@@ -1,0 +1,31 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <h1 class="app-title">Kanban board</h1>
+    <div class="workspace">
+      <select #workspaceSelect class="workspace-select" aria-label="Choose a board"
+        (change)="workspaceChange.emit(workspaceSelect.value || null)">
+        <option value="" [selected]="workspaceId() === null">My board</option>
+        @for (group of groups(); track group._id) {
+          <option [value]="group._id" [selected]="workspaceId() === group._id">{{ group.name }}</option>
+        }
+      </select>
+      @if (activeGroup()) {
+        <button class="btn btn-ghost btn-small" type="button" (click)="groupSettings.emit()">Group settings</button>
+        <button class="btn btn-ghost btn-small" type="button" (click)="refresh.emit()"
+          title="Load the latest changes" aria-label="Refresh the board">Refresh</button>
+      }
+      <button class="btn btn-ghost btn-small" type="button" (click)="newGroup.emit()">+ New group</button>
+    </div>
+  </div>
+  <div class="user-area">
+    <button class="avatar" type="button" (click)="profile.emit()" aria-label="Edit profile" title="Edit profile">
+      @if (pictureUrl() && !pictureFailed()) {
+        <img [src]="pictureUrl()" alt="" (error)="pictureError.emit()" />
+      } @else {
+        {{ initial() }}
+      }
+    </button>
+    <span class="user-name">{{ displayName() }}</span>
+    <button class="btn btn-ghost" (click)="logout.emit()">Logout</button>
+  </div>
+</header>

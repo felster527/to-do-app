@@ -1,0 +1,254 @@
+<app-board-topbar
+  [groups]="groups()"
+  [workspaceId]="workspaceId()"
+  [activeGroup]="activeGroup()"
+  [displayName]="displayName"
+  [initial]="initial"
+  [pictureUrl]="pictureUrl"
+  [pictureFailed]="pictureFailed()"
+  (workspaceChange)="switchWorkspace($event)"
+  (groupSettings)="openGroupSettings()"
+  (refresh)="refreshBoard()"
+  (newGroup)="openNewGroup()"
+  (profile)="openProfile()"
+  (logout)="logout()"
+  (pictureError)="pictureFailed.set(true)" />
+
+<app-password-reminder-dialog />
+
+@if (editingProfile()) {
+  <app-profile-dialog
+    [username]="user()?.username ?? ''"
+    [initial]="initial"
+    [pictureUrl]="pictureUrl"
+    [pictureFailed]="pictureFailed()"
+    (closed)="closeProfile()"
+    (saved)="onProfileSaved()" />
+}
+
+@if (groupWindow() === 'new') {
+  <app-group-new-dialog
+    (closed)="closeGroupWindow()"
+    (created)="onGroupCreated($event)" />
+}
+
+@if (groupWindow() === 'settings' && activeGroup(); as group) {
+  <app-group-settings-dialog
+    [activeGroup]="group"
+    [isOwner]="isGroupOwner()"
+    [myId]="myId"
+    (closed)="closeGroupWindow()"
+    (groupChanged)="onGroupChanged($event)"
+    (groupGone)="onGroupGone($event)" />
+}
+
+<!-- A friendly message (for example: you joined a group) -->
+@if (notice()) {
+  <div class="notice-bar" role="status">
+    <span>{{ notice() }}</span>
+    <button class="notice-close" type="button" (click)="notice.set('')" aria-label="Dismiss this message">&#10005;</button>
+  </div>
+}
+
+<!-- Error message (only shows when something went wrong) -->
+@if (errorMessage()) {
+  <div class="error-bar" role="alert">{{ errorMessage() }}</div>
+}
+
+@if (loading()) {
+
+  <p class="loading">Loading your board...</p>
+
+} @else {
+
+  <!-- Board -->
+  <main class="board">
+    @for (status of statuses(); track status._id) {
+      @let tasksHere = getTasksByColumn(status);
+
+      <section class="column"
+        [class.drag-over]="dragOverStatus() === status.name"
+        [class.column-dragging]="draggingColumnId() === status._id"
+        [class.drop-before]="columnDropTarget()?.id === status._id && !columnDropTarget()?.after"
+        [class.drop-after]="columnDropTarget()?.id === status._id && columnDropTarget()?.after"
+        [style.background-color]="status.color"
+        [style.color]="getTextColor(status.color)"
+        (dragover)="onDragOver($event, status)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event, status)">
+
+        <div class="column-header">
+          @if (canManageColumns()) {
+            <!-- Handle: drag it to move the column, or press the left and right arrow keys -->
+            <span class="column-grip"
+              [id]="'grip-' + status._id"
+              role="button"
+              tabindex="0"
+              draggable="true"
+              title="Drag to move this column"
+              aria-label="Move column. Drag it, or press the left or right arrow key."
+              (dragstart)="onColumnDragStart($event, status)"
+              (dragend)="onColumnDragEnd()"
+              (keydown.arrowleft)="$event.preventDefault(); moveColumn(status, -1)"
+              (keydown.arrowright)="$event.preventDefault(); moveColumn(status, 1)">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <circle cx="9" cy="6" r="1.6" />
+                <circle cx="15" cy="6" r="1.6" />
+                <circle cx="9" cy="12" r="1.6" />
+                <circle cx="15" cy="12" r="1.6" />
+                <circle cx="9" cy="18" r="1.6" />
+                <circle cx="15" cy="18" r="1.6" />
+              </svg>
+            </span>
+          }
+
+          @if (renamingColumnId() === status._id) {
+            <input #renameInput
+              class="column-name-input"
+              [id]="'rename-' + status._id"
+              type="text"
+              maxlength="40"
+              [value]="status.name"
+              aria-label="Column name"
+              (keydown.enter)="$event.preventDefault(); saveRename(status, renameInput)"
+              (keydown.escape)="$event.stopPropagation(); cancelRename()"
+              (blur)="saveRename(status, renameInput)" />
+          } @else {
+            <h3 class="column-title" [attr.title]="canManageColumns() ? 'Double-click to rename' : null" (dblclick)="startRename(status)">{{ status.name }}</h3>
+          }
+          <span class="count">{{ tasksHere.length }}</span>
+
+          @if (canManageColumns()) {
+            <div class="column-actions">
+              <input class="swatch" type="color"
+                [value]="status.color"
+                (input)="changeStatusColor(status, $event)"
+                (change)="saveStatusColor(status)"
+                title="Change column color"
+                [attr.aria-label]="'Change color of ' + status.name" />
+              <button class="rename-column-btn" type="button"
+                (click)="startRename(status)"
+                title="Rename column"
+                [attr.aria-label]="'Rename column ' + status.name">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+              </button>
+              <button class="delete-column-btn"
+                (click)="deleteStatus(status)"
+                title="Delete column"
+                [attr.aria-label]="'Delete column ' + status.name">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4h8v2" />
+                  <path d="M19 6l-1 14H6L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="task-list">
+          @for (task of tasksHere; track task._id) {
+            <app-task-card
+              [task]="task"
+              [editing]="editingId() === task._id"
+              [dragging]="draggingId() === task._id"
+              [commentsOpen]="commentsOpenFor() === task._id"
+              [authorOf]="authorOf"
+              (editStart)="startEdit(task)"
+              (editCancel)="cancelEdit()"
+              (editSave)="saveEdit(task, $event.title, $event.description, $event.priority, $event.due)"
+              (deleteClick)="deleteTask(task._id)"
+              (doneToggle)="toggleDone(task)"
+              (dragStartCard)="onDragStart($event, task)"
+              (dragEndCard)="onDragEnd()"
+              (commentsToggle)="toggleComments(task)"
+              (commentsClose)="closeComments()"
+              (commentAdd)="addComment(task, $event)" />
+          } @empty {
+            @if (addingTaskTo() !== status._id) {
+              <p class="empty">Drop a task here</p>
+            }
+          }
+        </div>
+
+        <!-- Add a task to this column -->
+        @if (addingTaskTo() === status._id) {
+          <form class="inline-form"
+            (submit)="$event.preventDefault(); addTaskTo(status, newTitle, newDesc, newPriority, newDue)"
+            (keydown.escape)="closeTaskForm()">
+            <input #newTitle
+              [id]="'new-title-' + status._id"
+              type="text"
+              placeholder="Task title"
+              aria-label="Task title" />
+            <textarea #newDesc
+              rows="2"
+              placeholder="Description (optional)"
+              aria-label="Task description"></textarea>
+            <div class="field-row">
+              <label class="field">
+                <span>Priority</span>
+                <select #newPriority>
+                  <option value="">None</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Due date</span>
+                <input #newDue type="date" />
+              </label>
+            </div>
+            <div class="inline-actions">
+              <button class="btn btn-ghost" type="button" (click)="closeTaskForm()">Cancel</button>
+              <button class="btn btn-primary" type="submit">Add task</button>
+            </div>
+          </form>
+        } @else {
+          <button class="add-task-btn" type="button" (click)="openTaskForm(status)">+ Add task</button>
+        }
+      </section>
+    }
+
+    @if (canManageColumns()) {
+      <!-- Add a column -->
+      <div class="new-column">
+        @if (addingColumn()) {
+          <form class="inline-form"
+            (submit)="$event.preventDefault(); addStatus(columnName, columnColor)"
+            (keydown.escape)="closeColumnForm()">
+            <input #columnName
+              id="new-column-name"
+              type="text"
+              placeholder="Column name"
+              aria-label="Column name" />
+            <div class="color-row">
+              <label for="new-column-color">Color</label>
+              <input #columnColor
+                id="new-column-color"
+                class="swatch"
+                type="color"
+                value="#c4b5fd" />
+            </div>
+            <div class="inline-actions">
+              <button class="btn btn-ghost" type="button" (click)="closeColumnForm()">Cancel</button>
+              <button class="btn btn-primary" type="submit">Add column</button>
+            </div>
+          </form>
+        } @else {
+          <button class="add-column-btn" type="button" (click)="openColumnForm()">+ Add column</button>
+        }
+      </div>
+    } @else if (statuses().length === 0) {
+      <p class="empty-board">The group owner has not added any columns yet.</p>
+    }
+  </main>
+
+}

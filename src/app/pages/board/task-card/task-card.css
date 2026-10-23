@@ -1,0 +1,245 @@
+:host {
+  display: contents;
+}
+
+/* ---------- Task cards ---------- */
+.task-card {
+  position: relative;
+  padding: 12px 64px 12px 14px;
+  color: var(--ink);
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(20, 28, 45, 0.12), 0 0 0 1px rgba(20, 28, 45, 0.06);
+  cursor: grab;
+  animation: fade-in 160ms ease-out;
+}
+.task-card:active {
+  cursor: grabbing;
+}
+.task-card.dragging {
+  opacity: 0.4;
+}
+.task-title {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.task-description {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Edit and delete buttons in the top right corner of a card */
+.task-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 2px;
+}
+.task-action-btn {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 13px;
+  color: #8a93a3;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.edit-task-btn:hover {
+  color: var(--focus);
+  background: #e8f0fe;
+}
+.delete-task-btn:hover {
+  color: var(--danger);
+  background: #fdecea;
+}
+
+/* ---------- Edit form ---------- */
+.task-card.task-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  color: var(--ink);
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(20, 28, 45, 0.12), 0 0 0 1px rgba(20, 28, 45, 0.06);
+}
+.task-card.task-edit {
+  cursor: default;
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+.task-edit input[type="text"],
+.task-edit input[type="date"],
+.task-edit select,
+.task-edit textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  font: inherit;
+  color: var(--ink);
+  background: #fafbfc;
+  border: 1px solid var(--field-line);
+  border-radius: 8px;
+}
+.task-edit textarea {
+  resize: vertical;
+}
+.task-edit ::placeholder {
+  color: #6b7280;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------- Task details: priority, due date, done checkbox, comments ---------- */
+.field-row {
+  display: flex;
+  gap: 8px;
+}
+
+.task-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.task-head .task-title {
+  margin: 0;
+}
+.done-box {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 3px 0 0;
+  accent-color: var(--focus);
+  cursor: pointer;
+}
+.task-title.done,
+.task-description.done {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+
+.task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.badge {
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+}
+.badge-high {
+  color: #8a1c12;
+  background: #fdecea;
+}
+.badge-medium {
+  color: #7a4a00;
+  background: #fff1d6;
+}
+.badge-low {
+  color: #17603a;
+  background: #e3f6ea;
+}
+.due {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+.due.overdue {
+  font-weight: 600;
+  color: var(--danger);
+}
+.comment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 2px 8px;
+  font: inherit;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.comment-btn:hover {
+  color: var(--focus);
+  border-color: var(--focus);
+}
+
+.comments-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: -4px;
+  padding: 12px;
+  color: var(--ink);
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(20, 28, 45, 0.12), 0 0 0 1px rgba(20, 28, 45, 0.06);
+}
+.comment {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: #f3f5f8;
+  border-radius: 8px;
+}
+.comment-text {
+  margin: 0;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.comment-time {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+.comment-empty {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+.comment-form {
+  display: flex;
+  gap: 8px;
+}
+.comment-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  font: inherit;
+  color: var(--ink);
+  background: #fafbfc;
+  border: 1px solid var(--field-line);
+  border-radius: 8px;
+}
+.comment-form .btn {
+  padding: 6px 12px;
+}
+
+/* ---------- Respect "reduce motion" settings ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .task-card {
+    animation: none;
+  }
+}

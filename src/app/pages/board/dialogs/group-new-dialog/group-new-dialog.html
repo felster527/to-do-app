@@ -1,0 +1,23 @@
+<div class="modal-backdrop" (click)="closed.emit()">
+  <form class="modal" role="dialog" aria-modal="true" aria-labelledby="new-group-title"
+    (click)="$event.stopPropagation()"
+    (submit)="$event.preventDefault(); createGroup(groupNameInput)"
+    (keydown.escape)="closed.emit()">
+    <h2 id="new-group-title" class="modal-title">New group</h2>
+    <p class="modal-hint">A group has its own board. Everyone in the group can add and move tasks on it.</p>
+
+    <label class="modal-label" for="new-group-name">Group name</label>
+    <input #groupNameInput id="new-group-name" class="modal-input" type="text" maxlength="50" />
+
+    @if (groupError()) {
+      <p class="modal-error" role="alert">{{ groupError() }}</p>
+    }
+
+    <div class="inline-actions">
+      <button class="btn btn-ghost" type="button" (click)="closed.emit()">Cancel</button>
+      <button class="btn btn-primary" type="submit" [disabled]="groupBusy()">
+        {{ groupBusy() ? 'Creating...' : 'Create group' }}
+      </button>
+    </div>
+  </form>
+</div>

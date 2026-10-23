@@ -1,0 +1,46 @@
+<div class="modal-backdrop" (click)="closed.emit()">
+  <form class="modal" role="dialog" aria-modal="true" aria-labelledby="profile-title"
+    (click)="$event.stopPropagation()"
+    (submit)="$event.preventDefault(); saveProfile(usernameInput)"
+    (keydown.escape)="closed.emit()">
+    <h2 id="profile-title" class="modal-title">Edit profile</h2>
+
+    <div class="photo-row">
+      <span class="avatar avatar-large">
+        @if (photoPreview() || (pictureUrl() && !pictureFailed())) {
+          <img [src]="photoPreview() ?? pictureUrl()" alt="Profile photo" />
+        } @else {
+          {{ initial() }}
+        }
+      </span>
+      <div>
+        <input #photoInput
+          type="file"
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          hidden
+          (change)="onPhotoPicked($event)" />
+        <button class="btn btn-ghost" type="button" (click)="photoInput.click()">Choose photo</button>
+        <p class="modal-hint">JPG, PNG, GIF or WEBP, up to 2 MB.</p>
+      </div>
+    </div>
+
+    <label class="modal-label" for="profile-username">Username</label>
+    <input #usernameInput
+      id="profile-username"
+      class="modal-input"
+      type="text"
+      maxlength="30"
+      [value]="username()" />
+
+    @if (profileError()) {
+      <p class="modal-error" role="alert">{{ profileError() }}</p>
+    }
+
+    <div class="inline-actions">
+      <button class="btn btn-ghost" type="button" (click)="closed.emit()">Cancel</button>
+      <button class="btn btn-primary" type="submit" [disabled]="profileSaving()">
+        {{ profileSaving() ? 'Saving...' : 'Save' }}
+      </button>
+    </div>
+  </form>
+</div>

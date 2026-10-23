@@ -1,0 +1,81 @@
+<div class="login-page">
+  <!-- Left side: a small picture of the board (decoration only) -->
+  <aside class="showcase" aria-hidden="true">
+    <p class="wordmark">Kanban board</p>
+
+    <div class="mini-board">
+      <div class="mini-column mini-todo">
+        <p class="mini-title">To do <span class="mini-count">2</span></p>
+        <div class="mini-card">Beli Sayuran</div>
+        <div class="mini-card">Siramin Tanaman</div>
+      </div>
+
+      <div class="mini-column mini-progress">
+        <p class="mini-title">Progress <span class="mini-count">1</span></p>
+        <div class="mini-card mini-card-lifted">Kerjain Tugas</div>
+      </div>
+
+      <div class="mini-column mini-done">
+        <p class="mini-title">Done <span class="mini-count">1</span></p>
+        <div class="mini-card">Olaraga</div>
+      </div>
+    </div>
+
+    <p class="showcase-caption">
+      Drag a task from one column to the next. Your board is saved to your account.
+    </p>
+  </aside>
+
+  <!-- Right side: the login form -->
+  <main class="form-side">
+    <form class="login-form" (submit)="$event.preventDefault(); onSubmit(email, password)">
+      <p class="mobile-brand">Kanban board</p>
+
+      <h1>Log in</h1>
+      <p class="intro">Open your board and pick up your tasks.</p>
+
+      @if (error()) {
+        <p class="form-error" role="alert">{{ error() }}</p>
+      }
+
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input #email
+          id="login-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="you@gmail.com"
+          required />
+      </div>
+
+      <div class="field field-last">
+        <label for="login-password">Password</label>
+        <div class="password-row">
+          <input #password
+            id="login-password"
+            name="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            autocomplete="current-password"
+            required />
+          <button type="button" class="show-btn"
+            (click)="togglePassword()"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        <p class="hint">Just registered? Your password is in the email we sent you.</p>
+        <p class="hint"><a routerLink="/forgot-password">Forgot your password?</a></p>
+      </div>
+
+      <button class="submit-btn" type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Logging in...' : 'Log in' }}
+      </button>
+
+      <p class="switch">
+        New here? <a routerLink="/register">Create an account</a>
+      </p>
+    </form>
+  </main>
+
+</div>

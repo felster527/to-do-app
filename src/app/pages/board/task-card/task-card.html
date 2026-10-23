@@ -1,0 +1,123 @@
+@let task = cardTask();
+
+@if (editing()) {
+
+  <!-- Edit mode -->
+  <form class="task-card task-edit"
+    (submit)="$event.preventDefault(); editSave.emit({ title: editTitle, description: editDesc, priority: editPriority, due: editDue })"
+    (keydown.escape)="editCancel.emit()">
+    <input #editTitle
+      [id]="'edit-title-' + task._id"
+      type="text"
+      [value]="task.title"
+      placeholder="Task title"
+      aria-label="Edit task title" />
+    <textarea #editDesc
+      rows="3"
+      [value]="task.description"
+      placeholder="Task description"
+      aria-label="Edit task description"></textarea>
+    <div class="field-row">
+      <label class="field">
+        <span>Priority</span>
+        <select #editPriority>
+          <option value="">None</option>
+          <option value="low" [selected]="task.priority === 'low'">Low</option>
+          <option value="medium" [selected]="task.priority === 'medium'">Medium</option>
+          <option value="high" [selected]="task.priority === 'high'">High</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Due date</span>
+        <input #editDue type="date" [value]="dueValue(task)" />
+      </label>
+    </div>
+    <div class="inline-actions">
+      <button class="btn btn-ghost" type="button" (click)="editCancel.emit()">Cancel</button>
+      <button class="btn btn-primary" type="submit">Save</button>
+    </div>
+  </form>
+
+} @else {
+
+  <!-- Normal view -->
+  <article class="task-card"
+    [class.dragging]="dragging()"
+    draggable="true"
+    (dragstart)="dragStartCard.emit($event)"
+    (dragend)="dragEndCard.emit()"
+    (dblclick)="editStart.emit()">
+    <div class="task-actions">
+      <button class="task-action-btn edit-task-btn"
+        (click)="editStart.emit()"
+        title="Edit task"
+        aria-label="Edit task">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+        </svg>
+      </button>
+      <button class="task-action-btn delete-task-btn"
+        (click)="deleteClick.emit()"
+        title="Delete task"
+        aria-label="Delete task">✕</button>
+    </div>
+    <div class="task-head">
+      <input class="done-box" type="checkbox"
+        [checked]="task.isCompleted"
+        (change)="doneToggle.emit()"
+        (dblclick)="$event.stopPropagation()"
+        [attr.aria-label]="'Mark ' + task.title + ' as done'" />
+      <h4 class="task-title" [class.done]="task.isCompleted">{{ task.title }}</h4>
+    </div>
+    @if (task.description) {
+      <p class="task-description" [class.done]="task.isCompleted">{{ task.description }}</p>
+    }
+    <div class="task-meta" (dblclick)="$event.stopPropagation()">
+      @if (task.priority) {
+        <span class="badge"
+          [class.badge-high]="task.priority === 'high'"
+          [class.badge-medium]="task.priority === 'medium'"
+          [class.badge-low]="task.priority === 'low'">{{ priorityLabel(task.priority) }}</span>
+      }
+      @if (task.dueDate) {
+        <span class="due" [class.overdue]="isOverdue(task)">{{ dueLabel(task) }}</span>
+      }
+      <button class="comment-btn" type="button"
+        (click)="commentsToggle.emit()"
+        [attr.aria-expanded]="commentsOpen()"
+        [attr.aria-label]="'Comments (' + (task.comments?.length ?? 0) + ')'">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
+        </svg>
+        {{ task.comments?.length ?? 0 }}
+      </button>
+    </div>
+  </article>
+
+  <!-- Comments of this card (outside the draggable card, so typing works normally) -->
+  @if (commentsOpen()) {
+    <div class="comments-panel" (keydown.escape)="commentsClose.emit()">
+      @for (comment of task.comments ?? []; track $index) {
+        <div class="comment">
+          <p class="comment-text">{{ comment.content }}</p>
+          <span class="comment-time">{{ authorOf()(comment) }} &middot; {{ commentTime(comment) }}</span>
+        </div>
+      } @empty {
+        <p class="comment-empty">No comments yet.</p>
+      }
+      <form class="comment-form"
+        (submit)="$event.preventDefault(); commentAdd.emit(commentInput)">
+        <input #commentInput
+          [id]="'comment-' + task._id"
+          type="text"
+          placeholder="Write a comment"
+          aria-label="Write a comment" />
+        <button class="btn btn-primary" type="submit">Send</button>
+      </form>
+    </div>
+  }
+
+}

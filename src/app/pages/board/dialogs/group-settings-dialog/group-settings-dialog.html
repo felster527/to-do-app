@@ -1,0 +1,153 @@
+@let group = activeGroup();
+<div class="modal-backdrop" (click)="closed.emit()">
+  <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="group-title"
+    (click)="$event.stopPropagation()"
+    (keydown.escape)="closed.emit()">
+    <h2 id="group-title" class="modal-title">{{ group.name }}</h2>
+
+    @if (isOwner()) {
+      <h3 class="modal-section">Group details</h3>
+      <form class="invite-form" (submit)="$event.preventDefault(); saveGroupDetails(groupNameEdit, groupLimitEdit)">
+        <label class="field field-grow">
+          <span>Group name</span>
+          <input #groupNameEdit class="modal-input" type="text" maxlength="50" autocomplete="off"
+            [value]="group.name" />
+        </label>
+        <label class="field">
+          <span>Most people</span>
+          <input #groupLimitEdit class="modal-input" type="number" min="1" max="100"
+            [value]="group.maxMembers" />
+        </label>
+        <button class="btn btn-primary" type="submit" [disabled]="groupBusy()">Save</button>
+      </form>
+      @if (groupDetailsNote()) {
+        <p class="modal-hint" role="status">{{ groupDetailsNote() }}</p>
+      }
+    }
+
+    <h3 class="modal-section">Members ({{ group.members.length }} of {{ group.maxMembers }})</h3>
+    <ul class="member-list">
+      @for (member of group.members; track member._id) {
+        <li class="member">
+          <span class="avatar avatar-small">
+            @if (member.profilePictureUrl) {
+              <img [src]="member.profilePictureUrl" alt="" />
+            } @else {
+              {{ memberInitial(member) }}
+            }
+          </span>
+          <span class="member-name">
+            {{ member.username }}
+            @if (member._id === myId()) {
+              <span class="member-tag">you</span>
+            }
+            @if (member.isOwner) {
+              <span class="member-tag">owner</span>
+            }
+          </span>
+          @if (isOwner() && !member.isOwner) {
+            <button class="btn btn-ghost btn-small" type="button"
+              (click)="kickMember(member)" [disabled]="groupBusy()">Remove</button>
+          }
+        </li>
+      }
+    </ul>
+
+    @if (isOwner()) {
+      <h3 class="modal-section">Invite links</h3>
+      <form class="invite-form" (submit)="$event.preventDefault(); createInvitation(maxUsesInput, daysInput)">
+        <label class="field">
+          <span>People allowed</span>
+          <input #maxUsesInput class="modal-input" type="number" min="1" max="100" value="5" />
+        </label>
+        <label class="field">
+          <span>Valid for (days)</span>
+          <input #daysInput class="modal-input" type="number" min="1" max="30" value="7" />
+        </label>
+        <button class="btn btn-primary" type="submit" [disabled]="groupBusy()">Create link</button>
+      </form>
+
+      <!-- The link you just made: only a link and a Copy button -->
+      @if (latestInvitation(); as latest) {
+        <div class="invite invite-latest">
+          <div class="invite-link-row">
+            <input class="modal-input invite-link" type="text" readonly
+              [value]="latest.inviteLink"
+              aria-label="Invite link"
+              (focus)="$any($event.target).select()" />
+            <button class="btn btn-ghost btn-small" type="button" (click)="copyInvitation(latest)">
+              {{ copiedInvitationId() === latest._id ? 'Copied' : 'Copy' }}
+            </button>
+          </div>
+          <span class="invite-info">
+            Up to {{ latest.maxUses }} people can join with this link until {{ invitationDate(latest) }}.
+          </span>
+        </div>
+      }
+
+      @if (invitations().length > 0) {
+        <!-- All links, with their limit and the Turn off button. Closed until you open it. -->
+        <details class="invite-manage">
+          <summary>Manage links ({{ invitations().length }})</summary>
+          <div class="invite-list">
+          @for (invitation of invitations(); track invitation._id) {
+            <div class="invite" [class.invite-off]="invitation.status === 'revoked' || invitation.status === 'expired'">
+              <div class="invite-top">
+                <span class="badge"
+                  [class.badge-low]="invitation.status === 'active'"
+                  [class.badge-high]="invitation.status === 'revoked'"
+                  [class.badge-medium]="invitation.status === 'expired' || invitation.status === 'full'">{{ invitationStatusLabel(invitation) }}</span>
+                <span class="invite-info">
+                  {{ invitation.currentUses }} of {{ invitation.maxUses }} joined, valid until {{ invitationDate(invitation) }}
+                </span>
+              </div>
+              <div class="invite-link-row">
+                <input class="modal-input invite-link" type="text" readonly
+                  [value]="invitation.inviteLink"
+                  aria-label="Invite link"
+                  (focus)="$any($event.target).select()" />
+                <button class="btn btn-ghost btn-small" type="button" (click)="copyInvitation(invitation)">
+                  {{ copiedInvitationId() === invitation._id ? 'Copied' : 'Copy' }}
+                </button>
+              </div>
+              @if (invitation.status === 'active' || invitation.status === 'full') {
+                <div class="invite-actions">
+                  <label class="invite-quota">
+                    People allowed
+                    <input #quotaInput class="modal-input invite-quota-input" type="number"
+                      min="1" max="100" [value]="invitation.maxUses" />
+                  </label>
+                  <button class="btn btn-ghost btn-small" type="button"
+                    (click)="saveMaxUses(invitation, quotaInput)" [disabled]="groupBusy()">Save limit</button>
+                  <button class="btn btn-ghost btn-small" type="button"
+                    (click)="revokeInvitation(invitation)" [disabled]="groupBusy()">Turn off</button>
+                </div>
+              } @else {
+                <div class="invite-actions">
+                  <button class="btn btn-ghost btn-small" type="button"
+                    (click)="deleteInvitation(invitation)" [disabled]="groupBusy()">Delete</button>
+                </div>
+              }
+            </div>
+          }
+          </div>
+        </details>
+      } @else {
+        <p class="modal-hint">No invite links yet. Create one and send it to the people you want in this group.</p>
+      }
+    }
+
+    @if (groupError()) {
+      <p class="modal-error" role="alert">{{ groupError() }}</p>
+    }
+
+    <div class="inline-actions group-actions">
+      @if (isOwner()) {
+        <button class="btn btn-danger" type="button" (click)="deleteGroup()" [disabled]="groupBusy()">Delete group</button>
+      } @else {
+        <button class="btn btn-danger" type="button" (click)="leaveGroup()" [disabled]="groupBusy()">Leave group</button>
+      }
+      <button class="btn btn-primary" type="button" (click)="closed.emit()">Done</button>
+    </div>
+  </div>
+</div>

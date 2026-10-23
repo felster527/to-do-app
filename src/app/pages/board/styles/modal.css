@@ -1,0 +1,59 @@
+/* ---------- Dialog shell (shared by the profile, new group and group settings windows) ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(29, 36, 51, 0.5);
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-title {
+  margin: 0 0 8px;
+  font-size: 1.125rem;
+}
+
+.modal-hint {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.modal-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.modal-input {
+  padding: 10px;
+  font: inherit;
+  border: 1px solid var(--field-line);
+  border-radius: 8px;
+}
+
+.modal-error {
+  margin: 0;
+  padding: 8px 12px;
+  color: var(--danger);
+  background: #fdecea;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.modal .inline-actions {
+  justify-content: flex-end;
+  margin-top: 8px;
+}

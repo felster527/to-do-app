@@ -1,0 +1,361 @@
+/* ---------- Design tokens and page ---------- */
+:host {
+  --ink: #1d2433;
+  --ink-soft: #5b6475;
+  --paper: #eceff3;
+  --surface: #ffffff;
+  --line: #d5dae2;
+  --field-line: #8a93a3;
+  --focus: #2f6fed;
+  --danger: #b42318;
+
+  display: block;
+  min-height: 100vh;
+  padding: 0 20px 48px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.45;
+}
+
+/* ---------- Shared width (everything lines up) ---------- */
+.error-bar,
+.loading,
+.board {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---------- Messages ---------- */
+.error-bar {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  color: var(--danger);
+  background: #fdecea;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.loading {
+  margin-top: 48px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+/* ---------- Board and columns ---------- */
+.board {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 4px;
+  padding-bottom: 12px;
+  overflow-x: auto;
+}
+.column {
+  flex: 1 0 260px;
+  min-width: 260px;
+  box-sizing: border-box;
+  padding: 14px;
+  border-radius: 14px;
+  outline: 3px dashed transparent;
+  outline-offset: -3px;
+  transition: outline-color 150ms, box-shadow 150ms;
+}
+/* The column you are hovering over while dragging a card */
+.column.drag-over {
+  outline-color: color-mix(in srgb, currentColor 55%, transparent);
+  box-shadow: 0 8px 24px rgba(20, 28, 45, 0.18);
+}
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.column-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.count {
+  min-width: 24px;
+  padding: 1px 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+.column-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.column-actions .swatch {
+  width: 26px;
+  height: 26px;
+  border-color: color-mix(in srgb, currentColor 40%, transparent);
+}
+.delete-column-btn,
+.rename-column-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  opacity: 0.7;
+  cursor: pointer;
+}
+.delete-column-btn:hover,
+.rename-column-btn:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+/* Round color picker (column header and add-column form) */
+.swatch {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  overflow: hidden;
+  background: none;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.swatch::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.swatch::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+.swatch::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+/* ---------- Task cards ---------- */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 48px;
+}
+/* Shown when a column has no cards */
+.empty {
+  margin: 0;
+  padding: 14px;
+  text-align: center;
+  font-size: 0.875rem;
+  opacity: 0.75;
+  border: 2px dashed color-mix(in srgb, currentColor 35%, transparent);
+  border-radius: 10px;
+}
+
+/* ---------- Small forms inside the board ---------- */
+.inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  color: var(--ink);
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(20, 28, 45, 0.12), 0 0 0 1px rgba(20, 28, 45, 0.06);
+}
+.inline-form {
+  margin-top: 10px;
+}
+
+.inline-form input[type="text"],
+.inline-form input[type="date"],
+.inline-form select,
+.inline-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  font: inherit;
+  color: var(--ink);
+  background: #fafbfc;
+  border: 1px solid var(--field-line);
+  border-radius: 8px;
+}
+.inline-form textarea {
+  resize: vertical;
+}
+.inline-form ::placeholder {
+  color: #6b7280;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* "+ Add task" at the bottom of a column */
+.add-task-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  opacity: 0.8;
+  cursor: pointer;
+}
+.add-task-btn:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+/* "+ Add column" tile at the end of the board */
+.new-column {
+  flex: 0 0 260px;
+  min-width: 260px;
+  box-sizing: border-box;
+}
+.new-column .inline-form {
+  margin-top: 0;
+}
+.add-column-btn {
+  width: 100%;
+  padding: 14px;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 2px dashed #aab2c0;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.add-column-btn:hover {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 640px) {
+  :host {
+    padding: 0 12px 32px;
+  }
+  .board {
+    flex-direction: column;
+    overflow-x: visible;
+  }
+  .column,
+  .new-column {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ---------- Respect "reduce motion" settings ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .column {
+    transition: none;
+  }
+}
+
+/* ---------- Task details: priority, due date, done checkbox, comments ---------- */
+.field-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---------- Rename and reorder columns ---------- */
+.column-grip {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 28px;
+  margin-left: -6px;
+  border-radius: 6px;
+  opacity: 0.6;
+  cursor: grab;
+}
+.column-grip:hover,
+.column-grip:focus-visible {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+.column-grip:active {
+  cursor: grabbing;
+}
+.column-name-input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  background: #ffffff;
+  border: 2px solid var(--focus);
+  border-radius: 8px;
+}
+/* The column being dragged, and the bar that shows where it would land */
+.column.column-dragging {
+  opacity: 0.45;
+}
+.column.drop-before {
+  box-shadow: inset 6px 0 0 0 var(--focus);
+}
+.column.drop-after {
+  box-shadow: inset -6px 0 0 0 var(--focus);
+}
+
+/* On small screens the columns are stacked, so the drop bar goes on top or bottom instead */
+@media (max-width: 640px) {
+  .column.drop-before {
+    box-shadow: inset 0 6px 0 0 var(--focus);
+  }
+  .column.drop-after {
+    box-shadow: inset 0 -6px 0 0 var(--focus);
+  }
+}
+
+/* ---------- Groups ---------- */
+.notice-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  color: #17603a;
+  background: #e3f6ea;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.notice-close {
+  padding: 0 4px;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.empty-board {
+  margin: 24px;
+  color: var(--ink-soft);
+}

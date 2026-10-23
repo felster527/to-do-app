@@ -1,0 +1,144 @@
+/* ---------- Group settings window ---------- */
+.modal-wide {
+  max-width: 560px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.modal-section {
+  margin: 12px 0 4px;
+  font-size: 0.95rem;
+}
+
+.member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-small {
+  width: 28px;
+  height: 28px;
+  font-size: 0.8rem;
+  cursor: default;
+}
+
+.member-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-tag {
+  margin-left: 6px;
+  padding: 1px 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: #eef1f6;
+  border-radius: 999px;
+}
+
+.invite-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.invite-form .field {
+  flex: 1 1 120px;
+}
+
+.invite-form .field-grow {
+  flex: 3 1 200px;
+}
+
+.invite {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.invite-off {
+  opacity: 0.65;
+}
+
+.invite-manage {
+  margin-top: 4px;
+}
+
+.invite-manage > summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 6px 0;
+}
+
+.invite-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.invite-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.invite-info {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.invite-link-row {
+  display: flex;
+  gap: 8px;
+}
+
+.invite-link {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+}
+
+.invite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.invite-quota {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.invite-quota-input {
+  width: 72px;
+}
+
+.modal .group-actions {
+  justify-content: space-between;
+  margin-top: 8px;
+}

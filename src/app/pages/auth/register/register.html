@@ -1,0 +1,86 @@
+<div class="login-page">
+  <!-- Left side: what happens next -->
+  <aside class="showcase" aria-hidden="true">
+    <p class="wordmark">Kanban board</p>
+
+    <div class="mini-board">
+      <div class="mini-column mini-todo">
+        <p class="mini-title">To do <span class="mini-count">2</span></p>
+        <div class="mini-card">Beli Sayuran</div>
+        <div class="mini-card">Siramin Tanaman</div>
+      </div>
+
+      <div class="mini-column mini-progress">
+        <p class="mini-title">Progress <span class="mini-count">1</span></p>
+        <div class="mini-card mini-card-lifted">Kerjain Tugas</div>
+      </div>
+
+      <div class="mini-column mini-done">
+        <p class="mini-title">Done <span class="mini-count">1</span></p>
+        <div class="mini-card">Olaraga</div>
+      </div>
+    </div>
+    <p class="showcase-caption">
+      Drag a task from one column to the next. Your board is saved to your account.
+    </p>
+  </aside>
+  <!-- Right side: the form -->
+  <main class="form-side">
+    @if (success()) {
+
+      <div class="login-form">
+        <p class="mobile-brand">Kanban board</p>
+        <h1>Check your Gmail</h1>
+        <p class="intro">{{ success() }}</p>
+        <p class="notice">Open the email and press &ldquo;Set Your Password&rdquo;, then log in with your new password.</p>
+        <a class="submit-btn link-btn" routerLink="/login">Go to login</a>
+      </div>
+
+    } @else {
+
+      <form class="login-form" (submit)="$event.preventDefault(); onSubmit(username, email)">
+        <p class="mobile-brand">Kanban board</p>
+
+        <h1>Create your account</h1>
+        <p class="intro">We will email you a link to set your password.</p>
+
+        @if (error()) {
+          <p class="form-error" role="alert">{{ error() }}</p>
+        }
+
+        <div class="field">
+          <label for="register-username">Username</label>
+          <input #username
+            id="register-username"
+            name="username"
+            type="text"
+            autocomplete="name"
+            placeholder="Your name"
+            required />
+        </div>
+
+        <div class="field field-last">
+          <label for="register-email">Gmail</label>
+          <input #email
+            id="register-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            placeholder="you@gmail.com"
+            required />
+          <p class="hint">Use an address you can open. The link to set your password is sent there.</p>
+        </div>
+
+        <button class="submit-btn" type="submit" [disabled]="sending()">
+          {{ sending() ? 'Sending email...' : 'Create account' }}
+        </button>
+
+        <p class="switch">
+          Already have an account? <a routerLink="/login">Log in</a>
+        </p>
+      </form>
+
+    }
+  </main>
+
+</div>
